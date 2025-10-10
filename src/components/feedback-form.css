@@ -1,0 +1,266 @@
+/* Feedback Form Styles */
+.feedback-form-container {
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #60a5fa;
+    --success-color: #10b981;
+    --text-color: #1e293b;
+    --text-light: #64748b;
+    --bg-color: #ffffff;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --animation-duration: 0.3s;
+  
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    background-color: var(--bg-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px var(--shadow-color);
+    padding: 2rem;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+    overflow: hidden;
+    position: relative;
+    transition: transform var(--animation-duration) ease, box-shadow var(--animation-duration) ease;
+  }
+  
+  .feedback-form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px var(--shadow-color);
+  }
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .form-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .form-header p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+  }
+  
+  .form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem 0;
+    font-size: 1rem;
+    color: var(--text-color);
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    background: transparent;
+    outline: none;
+    transition: border-color var(--animation-duration) ease;
+  }
+  
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .form-group label {
+    position: absolute;
+    top: 0.75rem;
+    left: 0;
+    font-size: 1rem;
+    color: var(--text-light);
+    pointer-events: none;
+    transition: all var(--animation-duration) ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: var(--primary-color);
+  }
+  
+  .form-group input:focus ~ label,
+  .form-group textarea:focus ~ label,
+  .form-group input.has-content ~ label,
+  .form-group textarea.has-content ~ label,
+  .form-group label.active {
+    top: -0.5rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+  }
+  
+  .focus-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width var(--animation-duration) ease;
+  }
+  
+  .form-group input:focus ~ .focus-border,
+  .form-group textarea:focus ~ .focus-border {
+    width: 100%;
+  }
+  
+  .submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--animation-duration) ease, transform var(--animation-duration) ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .submit-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+  
+  .submit-button:active {
+    transform: translateY(0);
+  }
+  
+  .submit-button span {
+    margin-right: 0.5rem;
+    transition: transform var(--animation-duration) ease;
+  }
+  
+  .submit-button svg {
+    transition: transform var(--animation-duration) ease;
+    opacity: 0.8;
+  }
+  
+  .submit-button:hover span {
+    transform: translateX(-4px);
+  }
+  
+  .submit-button:hover svg {
+    transform: translateX(4px);
+  }
+  
+  .success-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  .success-message p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    color: var(--success-color);
+    font-weight: 600;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  /* Checkmark Animation */
+  .checkmark {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: var(--success-color);
+    stroke-miterlimit: 10;
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both, pulse 2s infinite;
+  }
+  
+  .checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: var(--success-color);
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  }
+  
+  .checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+  }
+  
+  @keyframes stroke {
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  @keyframes scale {
+    0%,
+    100% {
+      transform: none;
+    }
+    50% {
+      transform: scale3d(1.1, 1.1, 1);
+    }
+  }
+  
+  @keyframes fill {
+    100% {
+      box-shadow: inset 0 0 0 30px rgba(16, 185, 129, 0.1);
+    }
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .feedback-form-container {
+      padding: 1.5rem;
+      max-width: 100%;
+    }
+  
+    .form-header h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  
