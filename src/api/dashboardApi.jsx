@@ -1,12 +1,8 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 const API_BASE_URL = "http://localhost:8000"; 
 
-export const getDashboardData = async (token) => {
-    const response = await axios.get(`${API_BASE_URL}/dashboard/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+export const getDashboardData = async () => {
+    const response = await axiosInstance.get("/dashboard")
     return response.data;
   };

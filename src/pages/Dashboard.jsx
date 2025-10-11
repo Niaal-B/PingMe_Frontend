@@ -20,13 +20,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          toast.error("Unauthorized. Please log in.");
-          return;
-        }
-
-        const res = await getDashboardData(token);
+        const res = await getDashboardData();
         setData(res);
       } catch (error) {
         toast.error("Failed to fetch dashboard data", {
