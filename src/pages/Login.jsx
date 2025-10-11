@@ -67,12 +67,12 @@ const AuthPages = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-700 to-teal-900 flex items-center justify-center p-4">
-      <div className="bg-black rounded-3xl shadow-2xl max-w-6xl w-full overflow-hidden">
-        <div className="flex flex-col lg:flex-row">
+<div className="bg-black rounded-3xl shadow-2xl w-full max-w-4xl h-[610px] overflow-hidden">
+<div className="flex flex-col lg:flex-row">
           {/* Left Side - Form */}
           <div className="lg:w-1/2 p-8 lg:p-12">
             <div className="mb-8">
-              <h1 className="text-white text-2xl font-bold">Habu</h1>
+              <h1 className="text-white text-2xl font-bold">PingMe</h1>
             </div>
 
             <div className="mb-8">
@@ -179,21 +179,21 @@ const AuthPages = () => {
           {/* Right Side - Testimonials */}
           <div className="lg:w-1/2 bg-emerald-500 p-8 lg:p-12 flex flex-col justify-between">
             <div>
-              <h2 className="text-white text-4xl font-bold mb-4">
-                What's our<br />Jobseekers Said.
+              <h2 className="text-white text-4xl font-bold mb-2">
+                What our<br />users say
               </h2>
-              <div className="text-white text-6xl mb-8">"</div>
+              <div className="text-white text-6xl mb-1">"</div>
             </div>
 
-            <div className="mb-8">
-              <p className="text-white text-lg mb-6 leading-relaxed">
+            <div className="mb-2">
+              <p className="text-white text-lg mb-2 leading-relaxed">
                 {testimonial.quote}
               </p>
               <p className="text-white font-semibold text-lg">{testimonial.name}</p>
               <p className="text-white text-sm opacity-90">{testimonial.role}</p>
             </div>
 
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex gap-3">
                 <button
                   onClick={prevTestimonial}
@@ -210,15 +210,15 @@ const AuthPages = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 relative">
-              <button className="absolute -top-4 right-6 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl p-6 relative h-[190px]">
+            <button className="absolute -top-4 right-6 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow">
                 <Plus className="w-6 h-6 text-black" />
               </button>
               <h3 className="text-black font-semibold text-lg mb-3">
-                Get your right job and right place apply now
+                Connect instantly with friends on PingMe
               </h3>
               <p className="text-gray-600 text-sm mb-4">
-                Be among the first founders to experience the easiest way to start & run a business.
+                Experience seamless messaging and real-time chat with everyone.
               </p>
               <div className="flex -space-x-2">
                 <div className="w-8 h-8 rounded-full bg-blue-400 border-2 border-white"></div>
