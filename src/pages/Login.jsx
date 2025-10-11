@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { registerUser,loginUser } from '../api/auth';
+import * as Toast from "@radix-ui/react-toast";
+import { useNavigate } from 'react-router-dom';
 
 const testimonials = [
   {
@@ -22,6 +25,11 @@ const testimonials = [
 const AuthPages = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [error, setError] = useState("");
+  const [loding, setLoading] = useState("");
+  const [toast, setToast] = useState({ open: false, message: "", type: "error" });
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -43,31 +51,43 @@ const AuthPages = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setToast({ open: false, message: "", type: "error" });
+  
     if (isLogin) {
-      const loginData = {
-        email: formData.email,
-        password: formData.password
-      };
-      console.log('Login Data:', loginData);
-      alert('Login submitted! Check console for data.');
+      try {
+        await loginUser({ email: formData.email, password: formData.password });
+        setToast({ open: true, message: "Login successful!", type: "success" });
+        setTimeout(() => {
+          navigate("/dashboard"); 
+        }, 500);
+      } catch (err) {
+        setToast({ open: true, message: err.response?.data?.detail || "Login failed", type: "error" });
+      }
     } else {
-      const signupData = {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      };
-      console.log('Signup Data:', signupData);
-      alert('Sign up submitted! Check console for data.');
+      try {
+        await registerUser({ username: formData.username, email: formData.email, password: formData.password });
+        setToast({ open: true, message: "Registration successful!", type: "success" });
+        setIsLogin(true)
+        setFormData({
+          username: '',
+          email: '',
+          password: ''
+        })
+      } catch (err) {
+        setToast({ open: true, message: err.response?.data?.detail || "Registration failed", type: "error" });
+      }
     }
   };
+  
 
   const testimonial = testimonials[currentTestimonial];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-700 to-teal-900 flex items-center justify-center p-4">
-<div className="bg-black rounded-3xl shadow-2xl w-full max-w-4xl h-[610px] overflow-hidden">
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-teal-700 to-teal-900 flex items-center justify-center p-4">
+<div className="bg-black rounded-3xl shadow-2xl w-full max-w-4xl h-[650px] overflow-hidden">
 <div className="flex flex-col lg:flex-row">
           {/* Left Side - Form */}
           <div className="lg:w-1/2 p-8 lg:p-12">
@@ -231,6 +251,62 @@ const AuthPages = () => {
         </div>
       </div>
     </div>
+
+    <Toast.Root
+  open={toast.open}
+  onOpenChange={(open) => setToast({ ...toast, open })}
+  className={`
+    flex items-center space-x-4
+    max-w-sm w-full p-4 rounded-xl shadow-2xl
+    text-white
+    ${toast.type === "error" ? "bg-gradient-to-r from-red-600 to-red-500" : "bg-gradient-to-r from-emerald-500 to-green-500"}
+    animate-slide-in-fade
+  `}
+>
+  {/* Icon */}
+  <div>
+    {toast.type === "error" ? (
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    ) : (
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    )}
+  </div>
+
+  {/* Message */}
+  <div className="flex-1">
+    <Toast.Title className="font-semibold text-sm">
+      {toast.type === "error" ? "Oops!" : "Success!"}
+    </Toast.Title>
+    <Toast.Description className="text-sm opacity-90">
+      {toast.message}
+    </Toast.Description>
+  </div>
+
+  {/* Close button */}
+  <Toast.Close className="text-white opacity-70 hover:opacity-100 transition-opacity">
+    ✕
+  </Toast.Close>
+</Toast.Root>
+
+
+    </>
+  
   );
 };
 
