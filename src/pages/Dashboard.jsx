@@ -1,22 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { Plus, LogIn, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { getRooms } from "../api/roomsApi";
+import CreateRoomModal from "../components/CreateRoomModal";
 
 const Dashboard = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // placeholders for modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
   useEffect(() => {
-    // TODO: Fetch rooms from API here later
+    fetchRooms();
   }, []);
+
+  const fetchRooms = async () => {
+    try {
+      setLoading(true);
+      const data = await getRooms();
+      setRooms(data);
+    } catch (error) {
+      console.error("Failed to fetch rooms:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRoomCreated = (newRoom) => {
+    setRooms((prev) => [newRoom, ...prev]);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-teal-900 to-emerald-950 text-white flex flex-col items-center p-6">
-      {/* Header */}
       <header className="w-full max-w-6xl flex justify-between items-center mb-10">
         <h1 className="text-3xl font-bold text-emerald-400">PingMe Dashboard</h1>
         <div className="flex gap-4">
@@ -36,7 +51,6 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Room List */}
       <div className="w-full max-w-6xl">
         <h2 className="text-xl font-semibold mb-4">Available Rooms</h2>
 
@@ -51,14 +65,13 @@ const Dashboard = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room, index) => (
               <motion.div
-                key={index}
+                key={room.id || index}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
                 className="p-5 bg-emerald-900/40 border border-emerald-800 rounded-2xl shadow-lg hover:shadow-emerald-700/30 transition"
               >
                 <h3 className="text-lg font-bold mb-1 text-emerald-300">{room.name}</h3>
-                <p className="text-gray-400 text-sm mb-3">Owner: {room.owner || "Unknown"}</p>
                 <button className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-4 py-2 rounded-lg transition">
                   Join Chat
                 </button>
@@ -68,35 +81,11 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Placeholder modals */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-emerald-900 p-6 rounded-2xl shadow-2xl w-96">
-            <h2 className="text-xl font-bold mb-4 text-emerald-300">Create a Room</h2>
-            <p className="text-gray-400 text-sm mb-4">Modal placeholder – coming next step</p>
-            <button
-              onClick={() => setIsCreateModalOpen(false)}
-              className="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {isJoinModalOpen && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-emerald-900 p-6 rounded-2xl shadow-2xl w-96">
-            <h2 className="text-xl font-bold mb-4 text-emerald-300">Join a Room</h2>
-            <p className="text-gray-400 text-sm mb-4">Modal placeholder – coming next step</p>
-            <button
-              onClick={() => setIsJoinModalOpen(false)}
-              className="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <CreateRoomModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onRoomCreated={handleRoomCreated}
+        />
       )}
     </div>
   );
