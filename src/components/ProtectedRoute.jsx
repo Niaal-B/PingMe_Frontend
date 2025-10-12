@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { getDashboardData } from "../api/dashboardApi";
 
 export const ProtectedRoute = ({ children }) => {
-  const [isValid, setIsValid] = useState(null); // null = loading, true/false = result
+  const [isValid, setIsValid] = useState(null); 
   const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
