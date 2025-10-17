@@ -3,12 +3,14 @@ import { Plus, LogIn, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { getRooms } from "../api/roomsApi";
 import CreateRoomModal from "../components/CreateRoomModal";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRooms();
@@ -72,8 +74,10 @@ const Dashboard = () => {
                 className="p-5 bg-emerald-900/40 border border-emerald-800 rounded-2xl shadow-lg hover:shadow-emerald-700/30 transition"
               >
                 <h3 className="text-lg font-bold mb-1 text-emerald-300">{room.name}</h3>
-                <button className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-4 py-2 rounded-lg transition">
-                  Join Chat
+                <button 
+                  onClick={() => navigate(`/chat/${room.id}`)}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-4 py-2 rounded-lg transition"
+                >                  Join Chat
                 </button>
               </motion.div>
             ))}
