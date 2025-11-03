@@ -11,10 +11,17 @@ const instance = axios.create({
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url || "";
+
+    if (
+      error.response?.status === 401 &&
+      !requestUrl.includes("/auth/login") &&
+      !requestUrl.includes("/auth/register")
+    ) {
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );

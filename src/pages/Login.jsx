@@ -46,7 +46,6 @@ const AuthPages = () => {
     try {
       if (isLogin) {
         await login(formData.email, formData.password);
-        showToast("Logged in successfully");
         navigate("/dashboard");
       } else {
         const res = await fetch("http://localhost:8000/auth/register", {

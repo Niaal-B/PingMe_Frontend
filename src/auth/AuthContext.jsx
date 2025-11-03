@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -7,13 +8,28 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [user, setUser] = useState(null);
 
-  // Attach token to Axios
+  // Attach token to Axios headers
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     } else {
       delete axios.defaults.headers.common["Authorization"];
     }
+  }, [token]);
+
+  // Validate token on app load
+  useEffect(() => {
+    const validateToken = async () => {
+      if (token) {
+        try {
+          const res = await axios.get("/auth/me");
+          setUser(res.data); // optional: store user profile
+        } catch (err) {
+          logout(); // token is invalid or expired
+        }
+      }
+    };
+    validateToken();
   }, [token]);
 
   const login = async (email, password) => {
@@ -28,7 +44,6 @@ export const AuthProvider = ({ children }) => {
       throw new Error(message);
     }
   };
-  
 
   const logout = () => {
     setToken(null);
