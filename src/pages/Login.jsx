@@ -41,7 +41,7 @@ const AuthPages = () => {
     setTimeout(() => setToast({ ...toast, open: false }), 3000);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => { 
     e.preventDefault();
     try {
       if (isLogin) {
@@ -61,7 +61,9 @@ const AuthPages = () => {
         }
   
         showToast("Account created successfully");
+
         setIsLogin(true);
+        setFormData({ username: '', email: '', password: '' });
       }
     } catch (err) {
       console.error("Auth error:", err);
