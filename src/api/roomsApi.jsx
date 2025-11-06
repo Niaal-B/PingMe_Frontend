@@ -15,6 +15,6 @@ export const getRooms = async () => {
 export const getMyRooms = async () => {
   const response = await axios.get("/rooms/my");
   return response.data;
-
-
 };
+
+

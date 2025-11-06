@@ -1,6 +1,6 @@
 import { Users, Loader, MessageCircle } from "lucide-react";
 
-export const RoomList = ({ title,rooms, isFetchingRooms, onJoinRoom }) => {
+export const RoomList = ({ title,rooms, isFetchingRooms, onJoinRoom, onDeleteRoom }) => {
   return (
     <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-2xl p-6 border border-teal-500 border-opacity-20">
       <div className="flex items-center gap-3 mb-6">
@@ -50,6 +50,16 @@ export const RoomList = ({ title,rooms, isFetchingRooms, onJoinRoom }) => {
                 >
                   Join
                 </button>
+
+                {onDeleteRoom && (
+                <button
+                  onClick={() => onDeleteRoom(room.id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors"
+                >
+                  Delete
+                </button>
+              )}
+
               </div>
             </div>
           ))}

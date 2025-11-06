@@ -56,7 +56,7 @@ export const CreateRoomForm = ({
         >
           <p
             className={`text-sm font-medium ${
-              message.type === "error" ? "text-red-400" : "text-emerald-400"
+              message.type === "error" ? "text-white-400" : "text-white-400"
             }`}
           >
             {message.text}

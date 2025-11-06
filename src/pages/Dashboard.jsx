@@ -6,6 +6,7 @@ import { WelcomeSection } from "../components/Dashboard/WelcomeSection";
 import { CreateRoomForm } from "../components/Dashboard/CreateRoomForm";
 import { RoomList } from "../components/Dashboard/RoomList";
 import { getRooms,getMyRooms } from "../api/roomsApi";
+import axios from "../api/axiosInstance";
 
 
 const Dashboard = () => {
@@ -57,12 +58,23 @@ const Dashboard = () => {
 
       setMessage({ text: "Room created successfully!", type: "success" });
       setRoomName("");
-      getRooms().then(setRooms);
-
+      getMyRooms().then(setMyRooms);
+      
     } catch (err) {
       setMessage({ text: err.message || "Something went wrong", type: "error" });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+
+  const handleDeleteRoom = async (roomId) => {
+    try {
+    
+      await axios.delete(`/rooms/${roomId}`);
+      setMyRooms((prev) => prev.filter((room) => room.id !== roomId));
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -91,6 +103,7 @@ const Dashboard = () => {
           rooms={myRooms}
           isFetchingRooms={isFetchingRooms}
           onJoinRoom={(id) => navigate(`/chat/${id}`)}
+          onDeleteRoom={handleDeleteRoom}
         />
         </div>
       </div>
