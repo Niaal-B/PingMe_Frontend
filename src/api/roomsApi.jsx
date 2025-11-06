@@ -1,11 +1,20 @@
-import axiosInstance from "./axiosInstance";
+import axios from "./axiosInstance";
 
-export const getRooms = async () => {
-  const response = await axiosInstance.get("/rooms/");
+export const createRoom = async (roomName) => {
+  const response = await axios.post("/rooms", { room_name: roomName });
   return response.data;
 };
 
-export const createRoom = async (roomName) => {
-  const response = await axiosInstance.post("/rooms/", { name: roomName });
+
+export const getRooms = async () => {
+  const response = await axios.get("/rooms");
   return response.data;
+};
+
+
+export const getMyRooms = async () => {
+  const response = await axios.get("/rooms/my");
+  return response.data;
+
+
 };

@@ -5,6 +5,8 @@ import { Header } from "../components/Dashboard/Header";
 import { WelcomeSection } from "../components/Dashboard/WelcomeSection";
 import { CreateRoomForm } from "../components/Dashboard/CreateRoomForm";
 import { RoomList } from "../components/Dashboard/RoomList";
+import { getRooms,getMyRooms } from "../api/roomsApi";
+
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -12,38 +14,22 @@ const Dashboard = () => {
 
   const [roomName, setRoomName] = useState("");
   const [rooms, setRooms] = useState([]);
+  const [myRooms, setMyRooms] = useState([]);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingRooms, setIsFetchingRooms] = useState(true);
 
   useEffect(() => {
-    fetchRooms();
-  }, []);
-
-  const fetchRooms = async () => {
-    setIsFetchingRooms(true);
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setMessage({ text: "Please log in to view rooms", type: "error" });
-        return;
-      }
-
-      const response = await fetch("http://localhost:8000/rooms", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch rooms");
-      const data = await response.json();
-      setRooms(data);
-    } catch (err) {
-      console.error("Fetch rooms error:", err);
-      setMessage({ text: err.message || "Failed to load rooms", type: "error" });
-    } finally {
+    getRooms().then(setRooms);
+    getMyRooms().then(setMyRooms);
+  
+    const timer = setTimeout(() => {
       setIsFetchingRooms(false);
-    }
-  };
-
+    }, 1000); 
+  
+    return () => clearTimeout(timer);
+  }, []);
+  
   const handleCreateRoom = async (e) => {
     e.preventDefault();
     setMessage({ text: "", type: "" });
@@ -71,7 +57,8 @@ const Dashboard = () => {
 
       setMessage({ text: "Room created successfully!", type: "success" });
       setRoomName("");
-      fetchRooms();
+      getRooms().then(setRooms);
+
     } catch (err) {
       setMessage({ text: err.message || "Something went wrong", type: "error" });
     } finally {
@@ -93,10 +80,18 @@ const Dashboard = () => {
             onCreateRoom={handleCreateRoom}
           />
           <RoomList
+            title="Available Rooms"
             rooms={rooms}
             isFetchingRooms={isFetchingRooms}
             onJoinRoom={(id) => navigate(`/chat/${id}`)}
           />
+
+        <RoomList
+          title="My Rooms"
+          rooms={myRooms}
+          isFetchingRooms={isFetchingRooms}
+          onJoinRoom={(id) => navigate(`/chat/${id}`)}
+        />
         </div>
       </div>
     </div>

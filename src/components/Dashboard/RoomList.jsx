@@ -1,13 +1,13 @@
 import { Users, Loader, MessageCircle } from "lucide-react";
 
-export const RoomList = ({ rooms, isFetchingRooms, onJoinRoom }) => {
+export const RoomList = ({ title,rooms, isFetchingRooms, onJoinRoom }) => {
   return (
     <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-2xl p-6 border border-teal-500 border-opacity-20">
       <div className="flex items-center gap-3 mb-6">
         <div className="bg-teal-500 rounded-full p-2">
           <Users className="w-5 h-5 text-white" />
         </div>
-        <h3 className="text-xl font-bold text-white">Available Rooms</h3>
+        <h3 className="text-xl font-bold text-white">{title}</h3>
         <span className="ml-auto bg-teal-500 bg-opacity-30 text-teal-300 px-3 py-1 rounded-full text-sm font-semibold">
           {rooms.length} {rooms.length === 1 ? "Room" : "Rooms"}
         </span>
@@ -26,11 +26,11 @@ export const RoomList = ({ rooms, isFetchingRooms, onJoinRoom }) => {
           </p>
         </div>
       ) : (
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-          {rooms.map((room) => (
+<div className="space-y-3 max-h-96 overflow-y-auto scrollbar-hide">
+{rooms.map((room) => (
             <div
               key={room.id}
-              className="bg-white bg-opacity-5 hover:bg-opacity-10 rounded-lg p-4 border border-teal-500 border-opacity-20 hover:border-opacity-40 transition-all"
+              className="bg-black bg-opacity-5 hover:bg-opacity-10 rounded-lg p-4 border border-teal-500 border-opacity-20 hover:border-opacity-40 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
