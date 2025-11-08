@@ -5,9 +5,8 @@ import { Header } from "../components/Dashboard/Header";
 import { WelcomeSection } from "../components/Dashboard/WelcomeSection";
 import { CreateRoomForm } from "../components/Dashboard/CreateRoomForm";
 import { RoomList } from "../components/Dashboard/RoomList";
-import { getRooms,getMyRooms } from "../api/roomsApi";
+import { getRooms, getMyRooms } from "../api/roomsApi";
 import axios from "../api/axiosInstance";
-
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -24,11 +23,9 @@ const Dashboard = () => {
     getRooms().then(setRooms);
     getMyRooms().then(setMyRooms);
   
-    const timer = setTimeout(() => {
       setIsFetchingRooms(false);
-    }, 1000); 
   
-    return () => clearTimeout(timer);
+    
   }, []);
   
   const handleCreateRoom = async (e) => {
@@ -67,10 +64,8 @@ const Dashboard = () => {
     }
   };
 
-
   const handleDeleteRoom = async (roomId) => {
     try {
-    
       await axios.delete(`/rooms/${roomId}`);
       setMyRooms((prev) => prev.filter((room) => room.id !== roomId));
     } catch (err) {
@@ -79,32 +74,38 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900">
-      <Header onLogout={() => { logout(); navigate("/login"); }} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <WelcomeSection user={user} />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <CreateRoomForm
-            roomName={roomName}
-            isLoading={isLoading}
-            message={message}
-            onRoomNameChange={setRoomName}
-            onCreateRoom={handleCreateRoom}
-          />
-          <RoomList
-            title="Available Rooms"
-            rooms={rooms}
-            isFetchingRooms={isFetchingRooms}
-            onJoinRoom={(id) => navigate(`/chat/${id}`)}
-          />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+      </div>
 
-        <RoomList
-          title="My Rooms"
-          rooms={myRooms}
-          isFetchingRooms={isFetchingRooms}
-          onJoinRoom={(id) => navigate(`/chat/${id}`)}
-          onDeleteRoom={handleDeleteRoom}
-        />
+      <div className="relative z-10">
+        <Header onLogout={() => { logout(); navigate("/login"); }} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <WelcomeSection user={user} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <CreateRoomForm
+              roomName={roomName}
+              isLoading={isLoading}
+              message={message}
+              onRoomNameChange={setRoomName}
+              onCreateRoom={handleCreateRoom}
+            />
+            <RoomList
+              title="Available Rooms"
+              rooms={rooms}
+              isFetchingRooms={isFetchingRooms}
+              onJoinRoom={(id) => navigate(`/rooms/${id}`)}            />
+            <RoomList
+              title="My Rooms"
+              rooms={myRooms}
+              isFetchingRooms={isFetchingRooms}
+              onJoinRoom={(id) => navigate(`/rooms/${id}`)}
+              onDeleteRoom={handleDeleteRoom}
+            />
+          </div>
         </div>
       </div>
     </div>

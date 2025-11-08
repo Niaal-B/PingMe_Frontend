@@ -11,6 +11,7 @@ export const AppRouter = () => (
     <Routes>
       <Route path="/login" element={<PublicRoute><Login/></PublicRoute>} />
       <Route path="/dashboard" element={<PrivateRoute><PingMeDashboard /></PrivateRoute>} />
+      <Route path="/rooms/:roomId" element={<PrivateRoute><ChatRoom/></PrivateRoute>} />
 
       <Route path="*" element={<Navigate to="/login" replace />} />
 

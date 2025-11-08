@@ -1,199 +1,312 @@
-// src/pages/ChatRoom.jsx
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { MessageCircle, Send, ArrowLeft, Users } from "lucide-react";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Send, LogOut, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-// Component for a single chat message
-const ChatMessage = ({ message }) => {
-  const isStatus = message.type === 'status';
-  const isMyMessage = message.user_id === parseInt(localStorage.getItem('userId')); // Assuming you store userId
-  
-  // Note: For a real app, ensure you store the user ID on login.
-  // For this example, we assume userId is set after successful login.
-  const myUserId = 1; // Placeholder: Replace with actual user ID from state/storage
-  const isSender = message.user_id === myUserId;
-
-  if (isStatus) {
-    return (
-      <div className="text-center text-sm text-yellow-300 italic py-2">
-        — {message.content} —
-      </div>
-    );
-  }
-
-  return (
-    <div className={`flex mb-4 ${isSender ? 'justify-end' : 'justify-start'}`}>
-      <div 
-        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-xl shadow-lg ${
-          isSender
-            ? 'bg-emerald-600 text-white rounded-br-none'
-            : 'bg-gray-700 text-white rounded-tl-none'
-        }`}
-      >
-        <span className={`block font-semibold text-xs mb-1 ${isSender ? 'text-emerald-100' : 'text-emerald-400'}`}>
-          {isSender ? 'You' : message.username}
-        </span>
-        <p>{message.content}</p>
-      </div>
-    </div>
-  );
-};
-
-
-const ChatRoom = () => {
-  const { roomId } = useParams(); // Get room ID from the URL (e.g., /chat/123)
+export default function ChatRoom() {
+  const { roomId } = useParams();
   const navigate = useNavigate();
-  
+  const wsRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const typingStopTimeoutRef = useRef(null);
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState('Connecting...');
-  
-  // Ref to hold the mutable WebSocket object
-  const ws = useRef(null); 
-  // Ref to keep the message list scrolled to the bottom
-  const messagesEndRef = useRef(null); 
-  
-  // Get the token from local storage
-  const accessToken = localStorage.getItem('accessToken');
-  
-  // --- WebSocket Connection Logic (useEffect) ---
+  const [input, setInput] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+  const [typingUsers, setTypingUsers] = useState([]);
+
   useEffect(() => {
-    if (!accessToken) {
-      setConnectionStatus('Authentication Failed.');
-      return; 
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    // Determine the correct WebSocket URL
-    // Use the host from the window location, replacing 'http' with 'ws' or 'https' with 'wss'
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host.split(':')[0]; // Get only the hostname
-    const port = 8000; // Your backend port
+    const ws = new WebSocket(`ws://localhost:8000/ws/rooms/${roomId}?token=${token}`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("✅ Connected to WebSocket");
+      setIsConnected(true);
+    };
     
-    // The final WebSocket URL, including the room ID and the JWT token
-    const WS_URL = `${protocol}://${host}:${port}/ws/chat/${roomId}?token=${accessToken}`;
-
-    // Initialize the WebSocket connection
-    ws.current = new WebSocket(WS_URL);
-
-    // --- WebSocket Event Handlers ---
-    ws.current.onopen = () => {
-      setConnectionStatus('Connected');
-      console.log('WebSocket connected successfully.');
-    };
-
-    ws.current.onmessage = (event) => {
-        console.log('--- RECEIVED MESSAGE ---', event.data); // CRITICAL: Ensure this log runs
-        const data = JSON.parse(event.data);
-        setMessages((prevMessages) => [...prevMessages, data]);
-    };
-
-    ws.current.onclose = (event) => {
-      setConnectionStatus('Disconnected');
-      console.log('WebSocket closed:', event.code, event.reason);
-      if (event.code === 1008 || event.code === 1000) {
-        // Code 1008 is Policy Violation (our security code); 1000 is normal close
-        if (event.code === 1008) {
-            alert('Your session expired or token is invalid. Please log in again.');
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            navigate('/login');
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("📩 Received:", data);
+      
+      // Handle different message types
+      if (data.type === "history") {
+        // Load message history
+        const historyMessages = data.payload || [];
+        setMessages((prev) => {
+          // Avoid duplicates by checking if we already have messages
+          if (prev.length === 0) {
+            return historyMessages.map(msg => ({
+              type: "message",
+              payload: msg
+            }));
+          }
+          return prev;
+        });
+      } else if (data.type === "join" || data.type === "leave") {
+        // Add join/leave messages to the chat
+        setMessages((prev) => [...prev, data]);
+      } else if (data.type === "message") {
+        // Add regular chat messages
+        setMessages((prev) => [...prev, data]);
+      } else if (data.type === "typing_start") {
+        // Add user to typing list
+        setTypingUsers((prev) => {
+          const userInfo = {
+            sender_id: data.payload.sender_id,
+            sender_name: data.payload.sender_name
+          };
+          // Check if user is already in the list
+          if (!prev.find(u => u.sender_id === userInfo.sender_id)) {
+            return [...prev, userInfo];
+          }
+          return prev;
+        });
+        // Auto-remove typing indicator after 1.5 seconds
+        if (typingStopTimeoutRef.current) {
+          clearTimeout(typingStopTimeoutRef.current);
         }
+        typingStopTimeoutRef.current = setTimeout(() => {
+          setTypingUsers((prev) => prev.filter(u => u.sender_id !== data.payload.sender_id));
+        }, 1500);
+      } else if (data.type === "typing_stop") {
+        // Remove user from typing list
+        setTypingUsers((prev) => prev.filter(u => u.sender_id !== data.payload.sender_id));
+        if (typingStopTimeoutRef.current) {
+          clearTimeout(typingStopTimeoutRef.current);
+        }
+      } else if (data.type === "error") {
+        console.error("WebSocket error:", data.payload);
       }
     };
-
-    ws.current.onerror = (error) => {
-      setConnectionStatus('Connection Error');
-      console.error('WebSocket Error:', error);
+    
+    ws.onclose = () => {
+      console.log("❌ WebSocket closed");
+      setIsConnected(false);
     };
 
-    // --- Cleanup Function (Runs when component unmounts) ---
     return () => {
-      if (ws.current) {
-        ws.current.close(); // Close the WebSocket connection cleanly
+      ws.close();
+      // Clean up typing timeouts
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (typingStopTimeoutRef.current) {
+        clearTimeout(typingStopTimeoutRef.current);
       }
     };
-  }, [roomId, accessToken, navigate]); // Dependencies: Re-run if room ID or token changes
+  }, [roomId]);
 
-  // --- Auto-Scroll to Bottom Effect ---
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // --- Message Sending Function ---
-  const sendMessage = (e) => {
-    e.preventDefault();
-    if (inputMessage.trim() === '' || ws.current.readyState !== WebSocket.OPEN) {
-      return;
+  const sendTypingStart = () => {
+    if (wsRef.current && isConnected) {
+      wsRef.current.send(JSON.stringify({
+        type: "typing_start"
+      }));
     }
-    
-    // The backend expects a raw string (the message content)
-    ws.current.send(inputMessage.trim()); 
-    setInputMessage('');
   };
 
-  const handleLeaveRoom = () => {
-      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-          ws.current.close(1000, "User left the room");
+  const sendTypingStop = () => {
+    if (wsRef.current && isConnected) {
+      wsRef.current.send(JSON.stringify({
+        type: "typing_stop"
+      }));
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInput(value);
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Send typing_stop if input is empty
+    if (value.trim() === "") {
+      sendTypingStop();
+      return;
+    }
+
+    // Send typing_start after 300ms of no typing
+    typingTimeoutRef.current = setTimeout(() => {
+      sendTypingStart();
+    }, 300);
+  };
+
+  const sendMessage = (e) => {
+    e?.preventDefault();
+    if (wsRef.current && input.trim() !== "") {
+      // Send typing_stop before sending message
+      sendTypingStop();
+      
+      wsRef.current.send(JSON.stringify({
+        type: "message",
+        payload: { content: input }
+      }));
+      setInput("");
+      
+      // Clear typing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
       }
-      navigate('/dashboard');
-  }
+    }
+  };
 
-  // --- Render Logic ---
-  return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* Header Bar */}
-      <header className="flex justify-between items-center p-4 bg-gray-900 border-b border-emerald-700 shadow-md">
-        <h1 className="text-xl font-bold text-emerald-400">
-          Room: {roomId} 
-          <span className={`text-sm ml-3 font-normal ${connectionStatus === 'Connected' ? 'text-green-500' : 'text-red-500'}`}>
-            {connectionStatus} 
+  // Helper function to render message content
+  const renderMessageContent = (msg) => {
+    if (msg.type === "join") {
+      return (
+        <div className="text-center py-2">
+          <span className="text-teal-400 text-sm italic">
+            {msg.payload?.sender_name || "Someone"} joined the room
           </span>
-          {connectionStatus === 'Connecting...' && <Loader2 className="w-4 h-4 inline ml-2 animate-spin" />}
-        </h1>
-        <button
-          onClick={handleLeaveRoom}
-          className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-semibold px-4 py-2 rounded-xl transition"
-        >
-          <LogOut className="w-5 h-5" /> Leave
-        </button>
-      </header>
-
-      {/* Message Area */}
-      <main className="flex-1 overflow-y-auto p-4 bg-gray-950">
-        <div className="max-w-4xl mx-auto">
-          {messages.map((msg, index) => (
-            <ChatMessage key={index} message={msg} />
-          ))}
-          <div ref={messagesEndRef} /> {/* Scroller reference */}
         </div>
-      </main>
-
-      {/* Input Form */}
-      <footer className="p-4 bg-gray-900 border-t border-emerald-700">
-        <div className="max-w-4xl mx-auto">
-          <form onSubmit={sendMessage} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Type your message..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              disabled={connectionStatus !== 'Connected'}
-              className="flex-1 p-3 bg-gray-800 border border-emerald-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white"
-            />
-            <button
-              type="submit"
-              disabled={connectionStatus !== 'Connected' || inputMessage.trim() === ''}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-6 py-3 rounded-lg transition disabled:bg-gray-600 disabled:text-gray-400"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
+      );
+    }
+    
+    if (msg.type === "leave") {
+      return (
+        <div className="text-center py-2">
+          <span className="text-gray-400 text-sm italic">
+            {msg.payload?.sender_name || "Someone"} left the room
+          </span>
         </div>
-      </footer>
+      );
+    }
+    
+    // Regular message
+    return (
+      <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-4 border border-teal-500/20 hover:border-teal-500/40 transition-all shadow-lg hover:shadow-xl">
+        <div className="flex items-start gap-3">
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full p-2 min-w-[36px] h-9 flex items-center justify-center shadow-lg">
+            <span className="text-white text-xs font-bold">
+              {(msg.payload?.sender_name || "System")[0].toUpperCase()}
+            </span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-semibold text-emerald-300 text-sm">
+                {msg.payload?.sender_name || "System"}
+              </span>
+              <span className="text-gray-500 text-xs">
+                {msg.payload?.timestamp 
+                  ? new Date(msg.payload.timestamp).toLocaleTimeString()
+                  : new Date().toLocaleTimeString()}
+              </span>
+            </div>
+            <p className="text-gray-200 text-sm leading-relaxed break-words">
+              {msg.payload?.content || ""}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        <div className="bg-black/50 backdrop-blur-xl rounded-3xl border border-teal-500/30 shadow-2xl flex flex-col h-[85vh] overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-teal-500/30 bg-black/30">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="bg-black/40 hover:bg-black/60 backdrop-blur-sm p-2 rounded-xl border border-teal-500/30 transition-all transform hover:scale-110 active:scale-95"
+              >
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+              <div className="bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl p-2.5 shadow-lg shadow-teal-500/50">
+                <MessageCircle className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Room {roomId}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></div>
+                  <p className="text-xs text-gray-400">{isConnected ? 'Connected' : 'Disconnected'}</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-teal-500/10 backdrop-blur-sm px-4 py-2 rounded-xl border border-teal-500/30">
+              <Users className="w-4 h-4 text-teal-300" />
+              <span className="text-teal-300 text-sm font-medium">Active</span>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto space-y-4 scrollbar-hide p-6 bg-gradient-to-b from-black/20 to-black/40">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="bg-teal-500/10 rounded-full p-6 mb-4">
+                  <MessageCircle className="w-12 h-12 text-gray-500" />
+                </div>
+                <p className="text-gray-400 text-lg mb-2">No messages yet</p>
+                <p className="text-gray-500 text-sm">Start the conversation!</p>
+              </div>
+            ) : (
+              messages.map((msg, i) => (
+                <div key={i}>
+                  {renderMessageContent(msg)}
+                </div>
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Typing Indicators */}
+          {typingUsers.length > 0 && (
+            <div className="px-6 py-2 border-t border-teal-500/20 bg-black/20">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-sm italic">
+                  {typingUsers.length === 1
+                    ? `${typingUsers[0].sender_name} is typing`
+                    : typingUsers.length === 2
+                    ? `${typingUsers[0].sender_name} and ${typingUsers[1].sender_name} are typing`
+                    : `${typingUsers[0].sender_name} and ${typingUsers.length - 1} others are typing`}
+                </span>
+                <div className="flex gap-1">
+                  <span className="w-1 h-1 bg-teal-400 rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-1 h-1 bg-teal-400 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-1 h-1 bg-teal-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Input */}
+          <div className="p-6 border-t border-teal-500/30 bg-black/30">
+            <form onSubmit={sendMessage} className="flex items-center gap-3">
+              <input
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Type your message..."
+                className="flex-1 px-5 py-3.5 rounded-xl bg-black/40 backdrop-blur-sm text-white placeholder-gray-400 border-2 border-teal-500/30 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-lg"
+                disabled={!isConnected}
+              />
+              <button
+                type="submit"
+                disabled={!isConnected || input.trim() === ""}
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transform hover:scale-105 active:scale-95"
+              >
+                <Send className="w-5 h-5" />
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default ChatRoom;
+}

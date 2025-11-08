@@ -1,4 +1,4 @@
-import { Plus, Loader } from "lucide-react";
+import { Plus, Loader, Sparkles } from "lucide-react";
 
 export const CreateRoomForm = ({
   roomName,
@@ -8,61 +8,62 @@ export const CreateRoomForm = ({
   onCreateRoom,
 }) => {
   return (
-    <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500 border-opacity-20">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-emerald-500 rounded-full p-2">
-          <Plus className="w-5 h-5 text-white" />
+    <div className="bg-black/50 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/30 shadow-2xl hover:border-emerald-500/50 transition-all relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+      <div className="relative z-10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl p-2.5 shadow-lg shadow-emerald-500/50">
+            <Plus className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl font-bold text-white">Create New Room</h3>
         </div>
-        <h3 className="text-xl font-bold text-white">Create New Room</h3>
-      </div>
 
-      <div className="mb-4">
-        <label className="text-gray-300 text-sm block mb-2">Room Name</label>
-        <input
-          type="text"
-          value={roomName}
-          onChange={(e) => onRoomNameChange(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg bg-black text-white placeholder-gray-400 border border-teal-500 border-opacity-30 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-          placeholder="Enter room name"
-          disabled={isLoading}
-        />
-      </div>
+        <form onSubmit={onCreateRoom} className="space-y-5">
+          <div>
+            <label className="text-gray-200 text-sm font-medium block mb-2">Room Name</label>
+            <input
+              type="text"
+              value={roomName}
+              onChange={(e) => onRoomNameChange(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-black/40 text-white placeholder-gray-400 border-2 border-teal-500/30 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-lg backdrop-blur-sm"
+              placeholder="Enter room name"
+              disabled={isLoading}
+            />
+          </div>
 
-      <button
-        onClick={onCreateRoom}
-        disabled={isLoading || !roomName.trim()}
-        className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        {isLoading ? (
-          <>
-            <Loader className="w-5 h-5 animate-spin" />
-            Creating...
-          </>
-        ) : (
-          <>
-            <Plus className="w-5 h-5" />
-            Create Room
-          </>
-        )}
-      </button>
+          <button
+            type="submit"
+            disabled={isLoading || !roomName.trim()}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            {isLoading ? (
+              <>
+                <Loader className="w-5 h-5 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                <Plus className="w-5 h-5" />
+                Create Room
+              </>
+            )}
+          </button>
+        </form>
 
-      {message.text && (
-        <div
-          className={`mt-4 p-3 rounded-lg ${
-            message.type === "error"
-              ? "bg-red-500 bg-opacity-20 border border-red-500"
-              : "bg-emerald-500 bg-opacity-20 border border-emerald-500"
-          }`}
-        >
-          <p
-            className={`text-sm font-medium ${
-              message.type === "error" ? "text-white-400" : "text-white-400"
+        {message.text && (
+          <div
+            className={`mt-4 p-4 rounded-xl backdrop-blur-sm border shadow-lg ${
+              message.type === "error"
+                ? "bg-red-500/20 border-red-500/50"
+                : "bg-emerald-500/20 border-emerald-500/50"
             }`}
           >
-            {message.text}
-          </p>
-        </div>
-      )}
+            <p className={`text-sm font-medium ${message.type === "error" ? "text-red-200" : "text-emerald-200"}`}>
+              {message.text}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
