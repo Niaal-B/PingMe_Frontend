@@ -362,32 +362,32 @@ export default function ChatRoom() {
       <div className="w-full h-screen px-2 sm:px-4 py-2 sm:py-4 relative z-10">
         <div className="bg-black/50 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-teal-500/30 shadow-2xl flex flex-col h-full overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-teal-500/20 bg-gradient-to-r from-black/40 to-black/30 backdrop-blur-xl">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between p-3 sm:p-5 border-b border-teal-500/20 bg-gradient-to-r from-black/40 to-black/30 backdrop-blur-xl">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <button
                 onClick={() => navigate("/dashboard")}
-                className="bg-black/40 hover:bg-black/60 backdrop-blur-sm p-2.5 rounded-xl border border-teal-500/30 transition-all transform hover:scale-110 active:scale-95 hover:border-teal-500/50"
+                className="bg-black/40 hover:bg-black/60 backdrop-blur-sm p-2 sm:p-2.5 rounded-xl border border-teal-500/30 transition-all transform hover:scale-110 active:scale-95 hover:border-teal-500/50 flex-shrink-0"
                 aria-label="Back to dashboard"
               >
-                <ArrowLeft className="w-5 h-5 text-white" />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </button>
-              <div className="relative">
+              <div className="relative flex-shrink-0">
                 <div className="absolute inset-0 bg-teal-500/20 rounded-xl blur-lg"></div>
-                <div className="relative bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl p-2.5 shadow-lg shadow-teal-500/50">
-                <MessageCircle className="w-6 h-6 text-white" />
+                <div className="relative bg-gradient-to-br from-teal-500 to-emerald-500 rounded-xl p-2 sm:p-2.5 shadow-lg shadow-teal-500/50">
+                <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Room {roomId}</h3>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base sm:text-xl font-bold text-white tracking-tight truncate">Room {roomId}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50' : 'bg-red-400'}`}></div>
-                  <p className="text-xs text-gray-400 font-medium">{isConnected ? 'Connected' : 'Disconnected'}</p>
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isConnected ? 'bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50' : 'bg-red-400'}`}></div>
+                  <p className="text-xs text-gray-400 font-medium truncate">{isConnected ? 'Connected' : 'Disconnected'}</p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-teal-500/10 backdrop-blur-sm px-4 py-2 rounded-xl border border-teal-500/30 hover:border-teal-500/50 transition-colors">
-              <Users className="w-4 h-4 text-teal-300" />
-              <span className="text-teal-300 text-sm font-medium">Active</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-teal-500/10 backdrop-blur-sm px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-teal-500/30 hover:border-teal-500/50 transition-colors flex-shrink-0 ml-2">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-300" />
+              <span className="text-teal-300 text-xs sm:text-sm font-medium hidden sm:inline">Active</span>
             </div>
           </div>
 
@@ -437,16 +437,16 @@ export default function ChatRoom() {
           )}
 
           {/* Input */}
-          <div className="p-4 border-t border-teal-500/20 bg-gradient-to-b from-black/40 to-black/50 backdrop-blur-xl">
-            <form onSubmit={sendMessage} className="flex items-end gap-3">
-              <div className="flex-1 relative">
+          <div className="p-2 sm:p-4 border-t border-teal-500/20 bg-gradient-to-b from-black/40 to-black/50 backdrop-blur-xl">
+            <form onSubmit={sendMessage} className="flex items-end gap-2 sm:gap-3">
+              <div className="flex-1 relative min-w-0">
                 {/* Emoji Picker */}
                 {showEmojiPicker && (
                   <div ref={emojiPickerRef} className="absolute bottom-full right-0 mb-2 z-50 rounded-2xl overflow-hidden shadow-2xl border border-teal-500/30">
                     <EmojiPicker
                       onEmojiClick={onEmojiClick}
                       theme="dark"
-                      width={350}
+                      width={typeof window !== 'undefined' && window.innerWidth < 640 ? Math.min(350, window.innerWidth - 32) : 350}
                       height={400}
                       previewConfig={{ showPreview: false }}
                       skinTonesDisabled
@@ -454,32 +454,32 @@ export default function ChatRoom() {
                   </div>
                 )}
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <button
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     aria-label="Toggle emoji picker"
-                    className={`p-2.5 rounded-xl border transition-all ${
+                    className={`p-2 sm:p-2.5 rounded-xl border transition-all flex-shrink-0 ${
                       showEmojiPicker
                         ? 'bg-teal-500/20 border-teal-500/50 text-teal-400'
                         : 'bg-black/40 hover:bg-black/60 border-teal-500/30 hover:border-teal-500/50 text-gray-400 hover:text-teal-400'
                     }`}
                     disabled={!isConnected}
                   >
-                    <Smile className="w-5 h-5" />
+                    <Smile className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   
               <input
                 value={input}
                     onChange={handleInputChange}
                     placeholder={isConnected ? "Type your message..." : "Connecting..."}
-                    className="flex-1 px-5 py-3.5 pr-12 rounded-2xl bg-black/50 backdrop-blur-sm text-white placeholder-gray-500 border-2 border-teal-500/20 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 min-w-0 px-3 sm:px-5 py-2.5 sm:py-3.5 pr-10 sm:pr-12 rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-sm text-white placeholder-gray-500 border-2 border-teal-500/20 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 disabled={!isConnected}
               />
                 </div>
                 
                 {input.trim() && (
-                  <div className="absolute right-3 bottom-3.5 text-xs text-gray-500">
+                  <div className="absolute right-2 sm:right-3 bottom-2.5 sm:bottom-3.5 text-xs text-gray-500 hidden sm:block">
                     Press Enter to send
                   </div>
                 )}
@@ -487,9 +487,9 @@ export default function ChatRoom() {
               <button
                 type="submit"
                 disabled={!isConnected || input.trim() === ""}
-                className="relative bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white p-3.5 rounded-2xl font-semibold transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[48px] h-[48px] transform hover:scale-105 active:scale-95 disabled:transform-none group"
+                className="relative bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl font-semibold transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[44px] sm:min-w-[48px] h-[44px] sm:h-[48px] flex-shrink-0 transform hover:scale-105 active:scale-95 disabled:transform-none group"
               >
-                <Send className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <Send className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 <span className="sr-only">Send message</span>
               </button>
             </form>
