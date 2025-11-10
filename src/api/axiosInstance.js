@@ -30,7 +30,8 @@ instance.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !requestUrl.includes("/auth/login") &&
-      !requestUrl.includes("/auth/register")
+      !requestUrl.includes("/auth/register") &&
+      !requestUrl.includes("/auth/me")
     ) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
