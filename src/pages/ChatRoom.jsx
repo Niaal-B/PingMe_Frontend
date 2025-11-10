@@ -442,11 +442,11 @@ export default function ChatRoom() {
               <div className="flex-1 relative min-w-0">
                 {/* Emoji Picker */}
                 {showEmojiPicker && (
-                  <div ref={emojiPickerRef} className="absolute bottom-full right-0 mb-2 z-50 rounded-2xl overflow-hidden shadow-2xl border border-teal-500/30">
+                  <div ref={emojiPickerRef} className="absolute bottom-full left-0 sm:left-auto sm:right-0 mb-2 z-50 rounded-2xl overflow-hidden shadow-2xl border border-teal-500/30">
                     <EmojiPicker
                       onEmojiClick={onEmojiClick}
                       theme="dark"
-                      width={typeof window !== 'undefined' && window.innerWidth < 640 ? Math.min(350, window.innerWidth - 32) : 350}
+                      width={typeof window !== 'undefined' && window.innerWidth < 640 ? Math.min(350, window.innerWidth - 16) : 350}
                       height={400}
                       previewConfig={{ showPreview: false }}
                       skinTonesDisabled
