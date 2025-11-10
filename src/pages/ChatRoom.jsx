@@ -48,7 +48,9 @@ export default function ChatRoom() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/rooms/${roomId}?token=${token}`);
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const wsUrl = apiUrl.replace("http://", "ws://").replace("https://", "wss://");
+    const ws = new WebSocket(`${wsUrl}/ws/rooms/${roomId}?token=${token}`);
     wsRef.current = ws;
 
     ws.onopen = () => {

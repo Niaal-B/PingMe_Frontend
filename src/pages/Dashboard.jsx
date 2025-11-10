@@ -41,7 +41,7 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:8000/rooms", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
