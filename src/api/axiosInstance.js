@@ -8,6 +8,19 @@ const instance = axios.create({
   },
 });
 
+// Add token to all requests
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 instance.interceptors.response.use(
   (response) => response,
@@ -19,7 +32,8 @@ instance.interceptors.response.use(
       !requestUrl.includes("/auth/login") &&
       !requestUrl.includes("/auth/register")
     ) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       window.location.href = "/login";
     }
 
