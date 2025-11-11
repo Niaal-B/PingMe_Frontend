@@ -20,7 +20,9 @@ export default function ChatRoom() {
   const [isConnected, setIsConnected] = useState(false);
   const [typingUsers, setTypingUsers] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [connectionError, setConnectionError] = useState(null);
   const emojiPickerRef = useRef(null);
+  const redirectTimeoutRef = useRef(null);
 
   // Update user ID ref when user changes
   useEffect(() => {
@@ -46,7 +48,10 @@ export default function ChatRoom() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
     const wsUrl = apiUrl.replace("http://", "ws://").replace("https://", "wss://");
@@ -171,9 +176,16 @@ export default function ChatRoom() {
       }
     };
     
-    ws.onclose = () => {
-      console.log("❌ WebSocket closed");
+    ws.onclose = (event) => {
+      console.log("❌ WebSocket closed", event);
       setIsConnected(false);
+      if (event.code === 1008) {
+        const message = event.reason || "Unable to join this room.";
+        setConnectionError(message);
+        redirectTimeoutRef.current = setTimeout(() => {
+          navigate("/dashboard", { replace: true, state: { error: message } });
+        }, 2000);
+      }
     };
 
     return () => {
@@ -185,8 +197,11 @@ export default function ChatRoom() {
       if (typingStopTimeoutRef.current) {
         clearTimeout(typingStopTimeoutRef.current);
       }
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
     };
-  }, [roomId]);
+  }, [roomId, navigate]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -353,6 +368,14 @@ export default function ChatRoom() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 relative overflow-hidden">
+      {connectionError && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
+          <div className="px-4 py-3 rounded-2xl bg-red-500/80 text-white shadow-xl border border-red-400/60 backdrop-blur">
+            <p className="text-sm font-semibold">{connectionError}</p>
+            <p className="text-xs opacity-80 mt-1">Redirecting to dashboard…</p>
+          </div>
+        </div>
+      )}
       {/* Animated background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
