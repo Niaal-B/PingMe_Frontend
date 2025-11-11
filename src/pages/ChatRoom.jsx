@@ -45,7 +45,7 @@ export default function ChatRoom() {
   }, [showEmojiPicker]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (!token) return;
 
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";

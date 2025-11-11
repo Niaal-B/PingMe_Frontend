@@ -20,12 +20,20 @@ const Dashboard = () => {
   const [isFetchingRooms, setIsFetchingRooms] = useState(true);
 
   useEffect(() => {
-    getRooms().then(setRooms);
-    getMyRooms().then(setMyRooms);
-  
-      setIsFetchingRooms(false);
-  
+    const fetchRooms = async () => {
+      try {
+        const allRooms = await getRooms();
+        const myRoomsData = await getMyRooms();
+        setRooms(allRooms);
+        setMyRooms(myRoomsData);
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+      } finally {
+        setIsFetchingRooms(false);
+      }
+    };
     
+    fetchRooms();
   }, []);
   
   const handleCreateRoom = async (e) => {
@@ -34,7 +42,7 @@ const Dashboard = () => {
     setIsLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         setMessage({ text: "Please log in to create a room", type: "error" });
         setIsLoading(false);

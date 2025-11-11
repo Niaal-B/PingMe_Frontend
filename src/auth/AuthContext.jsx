@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [token, setToken] = useState(() => localStorage.getItem("accessToken"));
   const [user, setUser] = useState(null);
 
   // Attach token to Axios headers
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
       const res = await axios.post("/auth/login", { email, password });
       const accessToken = res.data.access_token;
       setToken(accessToken);
-      localStorage.setItem("token", accessToken);
+      localStorage.setItem("accessToken", accessToken);
     } catch (err) {
       const message =
         err.response?.data?.detail || "Login failed. Please check your credentials.";
@@ -48,7 +48,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   };
 
   const isAuthenticated = !!token;
