@@ -81,18 +81,18 @@ const AuthPages = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-teal-900 via-teal-800 to-teal-700 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-teal-900 via-teal-800 to-teal-700 flex items-center justify-center px-3 py-6 sm:p-6 lg:p-8 relative overflow-hidden">
         {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
           <div className="absolute top-20 left-20 w-72 h-72 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
           <div className="absolute top-40 right-20 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
           <div className="absolute -bottom-20 left-1/2 w-72 h-72 bg-emerald-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
         </div>
 
-        <div className="bg-black/60 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-3xl h-auto min-h-[460px] overflow-hidden border border-teal-500/30 relative z-10">
+        <div className="bg-black/70 sm:bg-black/60 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md sm:max-w-lg lg:max-w-3xl h-auto lg:min-h-[460px] overflow-hidden border border-teal-500/30 relative z-10">
           <div className="flex flex-col lg:flex-row h-full">
             {/* Left Side - Form */}
-            <div className="lg:w-1/2 p-5 lg:p-7 flex flex-col justify-center">
+            <div className="lg:w-1/2 p-5 sm:p-6 lg:p-7 flex flex-col justify-center">
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl p-2.5 shadow-lg shadow-emerald-500/50">
@@ -184,10 +184,49 @@ const AuthPages = () => {
                   </button>
                 </div>
               </form>
+
+              <div className="lg:hidden mt-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-white font-semibold text-lg">What users say</h3>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={prevTestimonial}
+                      className="bg-white/15 hover:bg-white/25 backdrop-blur-sm p-2 rounded-xl border border-white/20 hover:border-white/30 transition-all"
+                      aria-label="Previous testimonial"
+                    >
+                      <ChevronLeft className="w-4 h-4 text-white" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextTestimonial}
+                      className="bg-white/15 hover:bg-white/25 backdrop-blur-sm p-2 rounded-xl border border-white/20 hover:border-white/30 transition-all"
+                      aria-label="Next testimonial"
+                    >
+                      <ChevronRight className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15 shadow-lg">
+                  <div className="text-white/30 text-5xl font-serif leading-none mb-2">"</div>
+                  <p className="text-white text-sm leading-relaxed mb-4">
+                    {testimonial.quote}
+                  </p>
+                  <div className="pt-3 border-t border-white/20 flex items-center justify-between text-sm">
+                    <div>
+                      <p className="text-white font-semibold">{testimonial.name}</p>
+                      <p className="text-white/70 text-xs">{testimonial.role}</p>
+                    </div>
+                    <span className="inline-flex px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-[11px] uppercase tracking-wide">
+                      PingMe
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Right Side - Testimonials */}
-            <div className="lg:w-1/2 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 p-5 lg:p-7 flex flex-col justify-between relative overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 p-5 lg:p-7 flex-col justify-between relative overflow-hidden">
               <div className="absolute top-0 right-0 w-56 h-56 bg-white/10 rounded-full -mr-28 -mt-28 blur-3xl"></div>
               <div className="absolute bottom-0 left-0 w-56 h-56 bg-teal-400/20 rounded-full -ml-28 -mb-28 blur-3xl"></div>
               
