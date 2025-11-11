@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Sparkles, Eye, EyeOff } from 'lucide-react';
 import * as Toast from "@radix-ui/react-toast";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../auth/AuthContext";
@@ -31,6 +31,7 @@ const AuthPages = () => {
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const testimonial = testimonials[testimonialIndex];
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -136,18 +137,32 @@ const AuthPages = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="text-gray-200 text-sm font-medium block mb-2">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl bg-white/95 text-black placeholder-gray-500 border-2 border-transparent focus:border-emerald-500 focus:outline-none transition-all shadow-lg"
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
+                <div className="relative">
+  <label className="text-gray-200 text-sm font-medium block mb-2">Password</label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={formData.password}
+      onChange={handleInputChange}
+      className="w-full px-4 py-3 pr-12 rounded-xl bg-white/95 text-black placeholder-gray-500 border-2 border-transparent focus:border-emerald-500 focus:outline-none transition-all shadow-lg"
+      placeholder="••••••••"
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600 transition-colors focus:outline-none"
+      aria-label={showPassword ? "Hide password" : "Show password"}
+    >
+      {showPassword ? (
+        <EyeOff className="w-5 h-5" />
+      ) : (
+        <Eye className="w-5 h-5" />
+      )}
+    </button>
+  </div>
+</div>
 
                 {isLogin && (
                   <div className="text-right">
