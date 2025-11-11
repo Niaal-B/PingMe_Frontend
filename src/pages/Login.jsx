@@ -6,19 +6,19 @@ import { useAuth } from "../auth/AuthContext";
 
 const testimonials = [
   {
-    quote: "Search and find your dream job is now easier than ever. Just browse a job and apply if you need to.",
-    name: "Mas Parjono",
-    role: "UI Designer at Google"
+    quote: "PingMe has transformed how our team communicates. Real-time messaging makes collaboration effortless and instant.",
+    name: "Alex Martinez",
+    role: "Team Lead at TechCorp"
   },
   {
-    quote: "The platform made my job search incredibly efficient. I found my perfect role within weeks!",
-    name: "Sarah Chen",
-    role: "Product Manager at Microsoft"
+    quote: "The best chat app I've used! Creating rooms is so easy, and the interface is clean and intuitive. Love it!",
+    name: "Emma Thompson",
+    role: "Developer at StartupHub"
   },
   {
-    quote: "Best job portal I've used. The interface is intuitive and the opportunities are endless.",
-    name: "James Wilson",
-    role: "Software Engineer at Amazon"
+    quote: "Seamless real-time communication with friends and colleagues. PingMe makes staying connected feel effortless.",
+    name: "David Kim",
+    role: "Product Designer at CreativeStudio"
   }
 ];
 
